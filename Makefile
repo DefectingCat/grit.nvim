@@ -4,6 +4,7 @@ all: build
 
 build:
 	cargo build --release
+	cp target/release/libgrit.so lua/grit.so
 
 test:
 	cargo test
