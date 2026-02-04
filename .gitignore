@@ -7,3 +7,7 @@ init.lua
 .cargo/
 .claude/
 vendor/
+# 编译产物
+lua/grit.so
+lua/grit.dylib
+lua/grit.dll
