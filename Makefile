@@ -20,7 +20,7 @@ test:
 	cargo test
 
 test-plugin: build
-	nvim --headless -c "set rtp+=/Users/xfy/Developer/grit.nvim" -c "luafile tests/test_plugin.lua"
+	nvim --headless -c "set rtp+=$(shell pwd)" -c "luafile tests/test_plugin.lua"
 
 clean:
 	cargo clean
