@@ -4,3 +4,6 @@
 tests/test_plugin.lua
 test_load.lua
 init.lua
+.cargo/
+.claude/
+vendor/

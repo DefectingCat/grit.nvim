@@ -14,11 +14,8 @@ fn grit() -> Dictionary {
         .build();
 
     // 尝试注册 :GritHello 命令
-    let result = api::create_user_command(
-        "GritHello",
-        "echo 'Hello World from Grit plugin!'",
-        &opts,
-    );
+    let result =
+        api::create_user_command("GritHello", "echo 'Hello World from Grit plugin!'", &opts);
 
     match result {
         Ok(_) => nvim::print!("GritHello command registered successfully"),

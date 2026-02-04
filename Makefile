@@ -4,13 +4,23 @@ all: build
 
 build:
 	cargo build --release
-	cp target/release/libgrit.so lua/grit.so
+	@# Copy the correct library file based on OS
+	@if [ "$(shell uname -s)" = "Darwin" ]; then \
+		cp target/release/libgrit.dylib lua/grit.so; \
+	elif [ "$(shell uname -s)" = "Linux" ]; then \
+		cp target/release/libgrit.so lua/grit.so; \
+	elif [ "$(shell uname -s)" = "Windows_NT" ]; then \
+		cp target/release/grit.dll lua/grit.dll; \
+	else \
+		echo "Unsupported OS: $(shell uname -s)"; \
+		exit 1; \
+	fi
 
 test:
 	cargo test
 
 test-plugin: build
-	nvim --headless -c "luafile tests/test_plugin.lua"
+	nvim --headless -c "set rtp+=/Users/xfy/Developer/grit.nvim" -c "luafile tests/test_plugin.lua"
 
 clean:
 	cargo clean
