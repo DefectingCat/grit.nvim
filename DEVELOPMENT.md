@@ -30,17 +30,21 @@ Grit 是一个用 Rust 编写的简单 Neovim 插件，使用 nvim-oxi 库与 Ne
 ### 4.1 使用 Cargo 直接编译
 
 #### 4.1.1 开发模式编译（调试版本）
+
 ```bash
 cd /home/xfy/Developer/grit
 cargo build
 ```
+
 生成文件：`target/debug/libgrit.so`
 
 #### 4.1.2 发布模式编译（优化版本）
+
 ```bash
 cd /home/xfy/Developer/grit
 cargo build --release
 ```
+
 生成文件：`target/release/libgrit.so`
 
 ### 4.2 使用 Makefile 编译
@@ -48,12 +52,14 @@ cargo build --release
 项目提供 Makefile 简化操作：
 
 #### 4.2.1 编译发布版本（推荐）
+
 ```bash
 cd /home/xfy/Developer/grit
 make build  # 等同于 cargo build --release
 ```
 
 #### 4.2.2 编译开发版本
+
 ```bash
 cd /home/xfy/Developer/grit
 make build-dev  # 等同于 cargo build
@@ -81,11 +87,38 @@ ls -la lua/
 
 ## 5. 使用插件
 
-### 5.1 启动 Neovim
+### 5.1 直接加载（自动方式）
 
 直接启动 Neovim，插件会通过 `plugin/grit.vim` 自动加载。
 
-### 5.2 执行命令
+### 5.2 使用 lazy.nvim 包管理器加载（推荐用于开发）
+
+在 Neovim 配置中（如 `~/.config/nvim/lua/plugins/grit.lua`），添加以下配置：
+
+```lua
+return {
+  -- 使用本地路径
+  dir = '/home/xfy/Developer/grit',
+  build = 'make build',
+  config = function()
+    require('grit')
+  end,
+}
+```
+
+#### 关键点说明
+
+- **`dir` 字段**：指向本地插件仓库的绝对路径
+- **`build` 字段**：lazy.nvim 会在安装/更新时自动运行此命令来编译插件
+- **`config` 字段**：插件加载后调用 `require('grit')` 来初始化
+
+#### 使用流程
+
+1. 确保已经编译过插件（如果没有，第一次加载时 lazy.nvim 会自动编译）
+2. 在 Neovim 中运行 `:Lazy sync` 来安装插件
+3. 使用 `:GritHello` 命令测试是否工作
+
+### 5.3 执行命令
 
 在 Neovim 中，输入以下命令：
 
@@ -95,7 +128,7 @@ ls -la lua/
 
 会在命令行中显示：`Hello World from Grit plugin!`
 
-### 5.3 检查 Lua 模块
+### 5.4 检查 Lua 模块
 
 在 Neovim 的 Lua 环境中，可以检查插件是否正确加载：
 
@@ -104,6 +137,7 @@ ls -la lua/
 ```
 
 会显示：
+
 ```
 { hello = "world" }
 ```
@@ -127,6 +161,7 @@ make test-plugin
 ```
 
 或者直接运行：
+
 ```bash
 cd /home/xfy/Developer/grit
 nvim --headless -u NONE -c "luafile tests/test_plugin.lua"
@@ -135,6 +170,7 @@ nvim --headless -u NONE -c "luafile tests/test_plugin.lua"
 ### 6.3 手动测试
 
 在 Neovim 中直接测试命令是否正常工作：
+
 ```bash
 cd /home/xfy/Developer/grit
 nvim -c "GritHello" -c "q"
@@ -192,6 +228,7 @@ fn grit() -> Dictionary {
 ### 9.2 命令注册
 
 命令注册使用 Neovim API：
+
 ```rust
 api::create_user_command(
     "GritHello",
@@ -224,3 +261,4 @@ api::create_user_command(
 ## 11. 许可证
 
 项目使用 MIT 许可证（根据 Cargo.toml 配置）。
+
