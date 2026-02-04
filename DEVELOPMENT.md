@@ -27,9 +27,35 @@ Grit 是一个用 Rust 编写的简单 Neovim 插件，使用 nvim-oxi 库与 Ne
 
 ## 4. 编译方法
 
-### 4.1 使用 Cargo 直接编译
+### 4.1 macOS 系统特殊配置
 
-#### 4.1.1 开发模式编译（调试版本）
+在 macOS 系统上编译 nvim-oxi 插件时，需要特殊的 linker 配置，因为 Neovim 没有提供单独的动态库，所有符号都嵌入在 Neovim 可执行文件中。
+
+#### 4.1.1 配置方法
+
+项目已包含必要的配置文件 `.cargo/config.toml`，内容如下：
+
+```toml
+[target.x86_64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
+
+[target.aarch64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
+```
+
+这些配置告诉 Rust 编译器：
+- `-undefined dynamic_lookup`：未定义的符号将在运行时动态查找，而不是在编译时强制解析
+- 这是因为 Neovim 的 API 符号只在 Neovim 进程运行时才会可用
+
+### 4.2 使用 Cargo 直接编译
+
+#### 4.2.1 开发模式编译（调试版本）
 
 ```bash
 cd /home/xfy/Developer/grit
@@ -38,7 +64,7 @@ cargo build
 
 生成文件：`target/debug/libgrit.so`
 
-#### 4.1.2 发布模式编译（优化版本）
+#### 4.2.2 发布模式编译（优化版本）
 
 ```bash
 cd /home/xfy/Developer/grit
@@ -47,36 +73,42 @@ cargo build --release
 
 生成文件：`target/release/libgrit.so`
 
-### 4.2 使用 Makefile 编译
+### 4.3 使用 Makefile 编译
 
-项目提供 Makefile 简化操作：
+项目提供 Makefile 简化操作，已自动处理 macOS 系统的库命名问题：
 
-#### 4.2.1 编译发布版本（推荐）
+#### 4.3.1 编译发布版本（推荐）
 
 ```bash
 cd /home/xfy/Developer/grit
 make build  # 等同于 cargo build --release
 ```
 
-#### 4.2.2 编译开发版本
+#### 4.3.2 编译开发版本
 
 ```bash
 cd /home/xfy/Developer/grit
 make build-dev  # 等同于 cargo build
 ```
 
-### 4.3 安装共享库
+### 4.4 安装共享库
 
-编译完成后，需要将共享库复制到 Lua 模块目录：
+编译完成后，Makefile 会自动将共享库复制到 Lua 模块目录。对于 macOS 系统，它会自动处理 `.dylib` 到 `.so` 的重命名。
+
+手动安装方法（如果需要）：
 
 ```bash
 cd /home/xfy/Developer/grit
+# macOS 系统
+cp target/release/libgrit.dylib lua/grit.so  # 发布版本
+# Linux 系统
 cp target/release/libgrit.so lua/grit.so  # 发布版本
 # 或者使用开发版本
-cp target/debug/libgrit.so lua/grit.so
+cp target/debug/libgrit.dylib lua/grit.so  # macOS
+cp target/debug/libgrit.so lua/grit.so  # Linux
 ```
 
-### 4.4 验证编译结果
+### 4.5 验证编译结果
 
 检查是否成功生成并复制了共享库：
 
@@ -244,6 +276,14 @@ api::create_user_command(
 ## 10. 常见问题
 
 ### 10.1 编译失败
+
+#### 10.1.1 链接器错误（macOS）
+
+**错误：** `Undefined symbols for architecture arm64` 或 `x86_64`，找不到 `_lua_*` 或 `_nvim_*` 符号
+
+**解决：** 确保项目根目录下存在 `.cargo/config.toml` 文件，并且包含正确的 macOS 链接器配置（如 4.1 节所述）。如果文件不存在，重新创建该文件即可。
+
+#### 10.1.2 找不到 Neovim 头文件
 
 **错误：** 找不到 Neovim 头文件
 **解决：** 确保安装了 Neovim 0.9+ 版本，并且在系统路径中可以找到。
