@@ -15,12 +15,14 @@ syn match GritTab "<tab>" containedin=ALL
 hi def link GritTab Keyword
 
 " Highlight command prefixes as keywords
-syn match GritCommand "za" containedin=ALL
-syn match GritCommand "s" containedin=ALL
-syn match GritCommand "u" containedin=ALL
-syn match GritCommand "x" containedin=ALL
-syn match GritCommand "c" containedin=ALL
-syn match GritCommand "?" containedin=ALL
+" 匹配命令前缀，只在单词边界或特定上下文中高亮
+" za - toggle，s - stage，u - unstage，x - discard，c - commit，? - help
+syn match GritCommand "\<za\>" containedin=ALL
+syn match GritCommand "\<s\>" containedin=ALL
+syn match GritCommand "\<u\>" containedin=ALL
+syn match GritCommand "\<x\>" containedin=ALL
+syn match GritCommand "\<c\>" containedin=ALL
+syn match GritCommand "\<\?\>" containedin=ALL
 hi def link GritCommand Keyword
 
 " Mark syntax as loaded
