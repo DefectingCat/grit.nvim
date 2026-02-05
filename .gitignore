@@ -9,3 +9,6 @@ vendor/
 lua/grit.so
 lua/grit.dylib
 lua/grit.dll
+
+nvim-oxi-0.6.0
+nvim-oxi-0.6.0.tar.gz
