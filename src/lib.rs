@@ -24,7 +24,7 @@ fn grit_command(_args: CommandArgs) -> Result<()> {
     api::command("tabnew")?;
 
     // 创建新的可列出但不可编辑的 buffer
-    let mut buffer = api::create_buf(true, false)?;
+    let mut buffer = api::create_buf(false, false)?;
 
     // 设置 buffer 名称
     if let Err(e) = buffer.set_name("GritStatus") {
