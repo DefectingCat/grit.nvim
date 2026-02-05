@@ -42,8 +42,8 @@ fn grit_command(_args: CommandArgs) -> Result<()> {
     // 打开新 tab 页
     api::command("tabnew")?;
 
-    // 创建新的可列出且可编辑的 buffer
-    let mut buffer = api::create_buf(true, true)?;
+    // 创建新的可列出但不可编辑的 buffer
+    let mut buffer = api::create_buf(true, false)?;
 
     // 设置 buffer 名称
     buffer.set_name("GritStatus")?;
@@ -53,6 +53,10 @@ fn grit_command(_args: CommandArgs) -> Result<()> {
 
     // 在 buffer 中添加初始内容
     buffer.set_lines(0..0, false, ["Grit Status Buffer", ""])?;
+
+    // 明确设置 buffer 为不可修改（只读）
+    api::command("setlocal nomodifiable")?;
+    api::command("setlocal readonly")?;
 
     nvim::print!("GritStatus buffer created successfully");
 
