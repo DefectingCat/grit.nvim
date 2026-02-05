@@ -5,17 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Grit Neovim Plugin
 
 A Neovim plugin written in Rust using the nvim-oxi library. Provides:
+
 - `:GritHello` command: Prints "Hello World from Grit plugin!" in the Neovim command line
 - `:Grit` command: Opens a new tab with a GritStatus buffer showing Git status and commands
 
 ## Key Commands
+
+Prefer using make for building
 
 ### Build
 
 ```bash
 make build              # Build release version
 make build-dev          # Build debug version
-cargo build --release   # Direct Cargo command
 ```
 
 ### Test
@@ -23,14 +25,12 @@ cargo build --release   # Direct Cargo command
 ```bash
 make test              # Run Rust unit tests
 make test-plugin       # Run plugin integration tests in Neovim
-cargo test             # Direct Cargo test command
 ```
 
 ### Clean
 
 ```bash
 make clean             # Clean all build artifacts
-cargo clean            # Direct Cargo clean command
 ```
 
 ## Project Architecture
@@ -51,6 +51,8 @@ cargo clean            # Direct Cargo clean command
 - **Vim script**: Plugin initialization and syntax highlighting
 - **Lua**: Integration testing and module loading
 
+If you need to access nvim-oxi files, use `cargo vendor`
+
 ### Plugin Functionality
 
 1. Plugin initializes via `grit()` function in `src/lib.rs:6`
@@ -70,11 +72,13 @@ cargo clean            # Direct Cargo clean command
 ### Syntax Highlighting
 
 Located in `syntax/grit.vim`:
+
 - `GritHint`: Highlights "Hint: " as comment
 - `GritTab`: Highlights "<tab>" as keyword
 - `GritCommand`: Highlights command prefixes (za, s, u, x, c, ?) at word boundaries
 
 **Commands**:
+
 - `za`: Toggle
 - `s`: Stage
 - `u`: Unstage
@@ -87,18 +91,22 @@ Located in `syntax/grit.vim`:
 ### Platform-Specific Notes
 
 #### macOS
+
 - Requires special linker configuration (`-undefined dynamic_lookup`)
 - Compiled as `.dylib` but renamed to `.so` for Lua compatibility
 
 #### Linux
+
 - Standard shared library compilation as `.so`
 
 #### Windows
+
 - Compiles as `.dll`
 
 ### Makefile Automation
 
 The Makefile automatically handles:
+
 1. Compilation with Cargo
 2. Copying the compiled library to `lua/grit.so`
 3. Platform-specific library renaming
@@ -120,7 +128,6 @@ return {
 ### Manual Testing
 
 ```bash
-nvim -c "GritHello" -c "q"          # Test :GritHello
 nvim -c "Grit" -c "q"              # Test :Grit
 ```
 

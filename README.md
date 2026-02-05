@@ -4,7 +4,6 @@ A Neovim plugin written in Rust using the nvim-oxi library. Provides Git status 
 
 ## Features
 
-- `:GritHello`: Prints "Hello World from Grit plugin!" in the Neovim command line
 - `:Grit`: Opens a new tab with a GritStatus buffer showing Git status and command hints
 - Syntax highlighting for command prefixes in the GritStatus buffer
 
@@ -28,7 +27,7 @@ A Neovim plugin written in Rust using the nvim-oxi library. Provides Git status 
 
 ```lua
 {
-  'your-username/grit',
+  'DefectingCat/grit.nvim',
   build = 'make build',
   config = function()
     require('grit')
@@ -40,7 +39,7 @@ A Neovim plugin written in Rust using the nvim-oxi library. Provides Git status 
 
 ```lua
 use {
-  'your-username/grit',
+  'DefectingCat/grit.nvim',
   run = 'make build',
   config = function()
     require('grit')
@@ -53,14 +52,11 @@ use {
 ### Basic Commands
 
 ```vim
-:GritHello
-```
-Prints "Hello World from Grit plugin!" in the Neovim command line.
-
-```vim
 :Grit
 ```
+
 Opens a new tab with a GritStatus buffer that shows:
+
 - Git status information
 - Command hints: `<tab> za toggle | s stage | u unstage | x discard | c commit | ? help`
 
@@ -92,7 +88,6 @@ The GritStatus buffer supports the following commands:
 ```bash
 make build              # Build release version
 make build-dev          # Build debug version
-cargo build --release   # Direct Cargo command
 ```
 
 ### Testing
@@ -100,16 +95,15 @@ cargo build --release   # Direct Cargo command
 ```bash
 make test              # Run Rust unit tests
 make test-plugin       # Run plugin integration tests in Neovim
-cargo test             # Direct Cargo test command
 ```
 
 ### Cleanup
 
 ```bash
 make clean             # Clean all build artifacts
-cargo clean            # Direct Cargo clean command
 ```
 
 ## License
 
 MIT
+
