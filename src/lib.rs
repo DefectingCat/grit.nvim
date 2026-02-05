@@ -7,6 +7,17 @@ use nvim_oxi::api::types::CommandArgs;
 
 #[nvim::plugin]
 fn grit() -> Dictionary {
+    // 创建 GritHello 命令选项
+    let hello_opts = CreateCommandOpts::builder()
+        .bang(true)
+        .desc("Prints hello from Grit plugin")
+        .build();
+
+    // 注册 GritHello 命令
+    if let Err(e) = api::create_user_command("GritHello", "echo 'Hello World from Grit plugin!'", &hello_opts) {
+        nvim::print!("Failed to register GritHello command: {:?}", e);
+    }
+
     let grit_opts = CreateCommandOpts::builder()
         .bang(true)
         .desc("Opens a new tab with GritStatus buffer")
@@ -50,6 +61,8 @@ fn grit_command(_args: CommandArgs) -> Result<()> {
     api::command("setlocal norelativenumber")?;
     // 设置 buffer 类型为 nofile，防止保存提示
     api::command("setlocal buftype=nofile")?;
+    // 设置文件类型为 grit，以便加载对应的语法高亮
+    api::command("setlocal filetype=grit")?;
 
     Ok(())
 }
