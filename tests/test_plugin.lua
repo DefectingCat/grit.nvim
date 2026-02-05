@@ -34,13 +34,23 @@ if grit.hello ~= 'world' then
   test_failure(string.format("Expected grit.hello to be 'world', got '%s'", grit.hello))
 end
 
--- Test 3: Check if GritHello command is available
+-- Test 3: Check if 'grit' key exists in the returned table
+if grit.grit ~= 'initialized' then
+  test_failure(string.format("Expected grit.grit to be 'initialized', got '%s'", grit.grit))
+end
+
+-- Test 4: Check if GritHello command is available
 local commands = vim.api.nvim_get_commands({})
 if not commands['GritHello'] then
   test_failure("GritHello command is not registered")
 end
 
--- Test 4: Test executing GritHello command
+-- Test 5: Check if Grit command is available
+if not commands['Grit'] then
+  test_failure("Grit command is not registered")
+end
+
+-- Test 6: Test executing GritHello command
 local ok2, err2 = pcall(function()
   vim.cmd("GritHello")
 end)
@@ -53,7 +63,9 @@ print("All tests passed!")
 print("- Plugin loaded successfully")
 print("- Plugin returns a valid table")
 print("- grit.hello == 'world'")
+print("- grit.grit == 'initialized'")
 print("- GritHello command is registered")
+print("- Grit command is registered")
 print("- GritHello command executes successfully")
 
 -- Exit Neovim with success code

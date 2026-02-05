@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Grit Neovim Plugin
 
-A simple Neovim plugin written in Rust using the nvim-oxi library. Provides a `:GritHello` command that prints "Hello World from Grit plugin!" in the Neovim command line.
+A simple Neovim plugin written in Rust using the nvim-oxi library. Provides a `:GritHello` command that prints "Hello World from Grit plugin!" in the Neovim command line, and a `:Grit` command that opens a new tab.
 
 ## Key Commands
 
