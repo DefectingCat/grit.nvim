@@ -2,16 +2,17 @@
 
 ## 1. 项目概述
 
-Grit 是一个用 Rust 编写的简单 Neovim 插件，使用 nvim-oxi 库与 Neovim API 交互。提供了一个 `:GritHello` 命令，在 Neovim 命令行中打印 "Hello World from Grit plugin!"。
+Grit 是一个用 Rust 编写的 Neovim 插件，使用 nvim-oxi 库与 Neovim API 交互。提供了一个 `:Grit` 命令，用于在 Neovim 中管理 Git 状态，包括暂存、取消暂存、丢弃更改等操作。
 
 ## 2. 项目结构
 
 ```
-/home/xfy/Developer/grit/
+grit.nvim/
 ├── src/lib.rs              # Rust 实现（主要插件逻辑）
 ├── lua/                    # Lua 模块目录
 │   └── grit.so            # 编译后的 Rust 共享库
 ├── plugin/grit.vim        # Vim 脚本初始化文件
+├── syntax/grit.vim        # GritStatus 缓冲区语法高亮
 ├── Cargo.toml             # Cargo 项目配置
 ├── Cargo.lock             # Cargo 依赖锁定文件
 ├── Makefile               # 简化编译和测试的 Makefile
@@ -30,8 +31,6 @@ Grit 是一个用 Rust 编写的简单 Neovim 插件，使用 nvim-oxi 库与 Ne
 ### 4.1 macOS 系统特殊配置
 
 在 macOS 系统上编译 nvim-oxi 插件时，需要特殊的 linker 配置，因为 Neovim 没有提供单独的动态库，所有符号都嵌入在 Neovim 可执行文件中。
-
-#### 4.1.1 配置方法
 
 项目已包含必要的配置文件 `.cargo/config.toml`，内容如下：
 
@@ -53,84 +52,42 @@ rustflags = [
 - `-undefined dynamic_lookup`：未定义的符号将在运行时动态查找，而不是在编译时强制解析
 - 这是因为 Neovim 的 API 符号只在 Neovim 进程运行时才会可用
 
-### 4.2 使用 Cargo 直接编译
-
-#### 4.2.1 开发模式编译（调试版本）
-
-```bash
-cd /home/xfy/Developer/grit
-cargo build
-```
-
-生成文件：`target/debug/libgrit.so`
-
-#### 4.2.2 发布模式编译（优化版本）
-
-```bash
-cd /home/xfy/Developer/grit
-cargo build --release
-```
-
-生成文件：`target/release/libgrit.so`
-
-### 4.3 使用 Makefile 编译
+### 4.2 使用 Makefile 编译
 
 项目提供 Makefile 简化操作，已自动处理 macOS 系统的库命名问题：
 
-#### 4.3.1 编译发布版本（推荐）
+#### 4.2.1 编译发布版本（推荐）
 
 ```bash
-cd /home/xfy/Developer/grit
-make build  # 等同于 cargo build --release
+cd /path/to/grit.nvim
+make build
 ```
 
-#### 4.3.2 编译开发版本
+#### 4.2.2 编译开发版本
 
 ```bash
-cd /home/xfy/Developer/grit
-make build-dev  # 等同于 cargo build
+cd /path/to/grit.nvim
+make build-dev
 ```
 
-### 4.4 安装共享库
-
-编译完成后，Makefile 会自动将共享库复制到 Lua 模块目录。对于 macOS 系统，它会自动处理 `.dylib` 到 `.so` 的重命名。
-
-手动安装方法（如果需要）：
-
-```bash
-cd /home/xfy/Developer/grit
-# macOS 系统
-cp target/release/libgrit.dylib lua/grit.so  # 发布版本
-# Linux 系统
-cp target/release/libgrit.so lua/grit.so  # 发布版本
-# 或者使用开发版本
-cp target/debug/libgrit.dylib lua/grit.so  # macOS
-cp target/debug/libgrit.so lua/grit.so  # Linux
-```
-
-### 4.5 验证编译结果
+### 4.3 验证编译结果
 
 检查是否成功生成并复制了共享库：
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 ls -la lua/
 ```
 
-## 5. 使用插件
+## 5. 开发环境配置
 
-### 5.1 直接加载（自动方式）
+### 5.1 使用 lazy.nvim 进行开发
 
-直接启动 Neovim，插件会通过 `plugin/grit.vim` 自动加载。
-
-### 5.2 使用 lazy.nvim 包管理器加载（推荐用于开发）
-
-在 Neovim 配置中（如 `~/.config/nvim/lua/plugins/grit.lua`），添加以下配置：
+在 Neovim 配置中（如 `~/.config/nvim/lua/plugins/grit.lua`），添加以下配置（注意：将 `/path/to/grit.nvim` 替换为你的实际项目路径）：
 
 ```lua
 return {
-  -- 使用本地路径
-  dir = '/home/xfy/Developer/grit',
+  dir = '/path/to/grit.nvim',
   build = 'make build',
   config = function()
     require('grit')
@@ -138,48 +95,20 @@ return {
 }
 ```
 
-#### 关键点说明
-
-- **`dir` 字段**：指向本地插件仓库的绝对路径
-- **`build` 字段**：lazy.nvim 会在安装/更新时自动运行此命令来编译插件
-- **`config` 字段**：插件加载后调用 `require('grit')` 来初始化
-
-#### 使用流程
+### 5.2 开发工作流程
 
 1. 确保已经编译过插件（如果没有，第一次加载时 lazy.nvim 会自动编译）
 2. 在 Neovim 中运行 `:Lazy sync` 来安装插件
-3. 使用 `:GritHello` 命令测试是否工作
-
-### 5.3 执行命令
-
-在 Neovim 中，输入以下命令：
-
-```vim
-:GritHello
-```
-
-会在命令行中显示：`Hello World from Grit plugin!`
-
-### 5.4 检查 Lua 模块
-
-在 Neovim 的 Lua 环境中，可以检查插件是否正确加载：
-
-```vim
-:lua print(vim.inspect(require('grit')))
-```
-
-会显示：
-
-```
-{ hello = "world" }
-```
+3. 使用 `:Grit` 命令测试是否工作
+4. 对代码进行修改后，重新编译插件：`make build`
+5. 在 Neovim 中重新加载插件：`:Lazy reload grit.nvim`
 
 ## 6. 测试插件
 
 ### 6.1 运行 Rust 单元测试
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 cargo test
 ```
 
@@ -188,14 +117,14 @@ cargo test
 使用 Neovim 运行 Lua 测试脚本：
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 make test-plugin
 ```
 
 或者直接运行：
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 nvim --headless -u NONE -c "luafile tests/test_plugin.lua"
 ```
 
@@ -204,8 +133,8 @@ nvim --headless -u NONE -c "luafile tests/test_plugin.lua"
 在 Neovim 中直接测试命令是否正常工作：
 
 ```bash
-cd /home/xfy/Developer/grit
-nvim -c "GritHello" -c "q"
+cd /path/to/grit.nvim
+nvim -c "Grit" -c "q"
 ```
 
 ## 7. 清理项目
@@ -213,16 +142,14 @@ nvim -c "GritHello" -c "q"
 ### 7.1 清理编译产物
 
 ```bash
-cd /home/xfy/Developer/grit
-cargo clean  # 清理所有编译产物
-# 或者使用 Makefile
+cd /path/to/grit.nvim
 make clean
 ```
 
 ### 7.2 删除共享库
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 rm lua/grit.so
 ```
 
@@ -231,14 +158,14 @@ rm lua/grit.so
 ### 8.1 更新依赖
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 cargo update
 ```
 
 ### 8.2 查看项目信息
 
 ```bash
-cd /home/xfy/Developer/grit
+cd /path/to/grit.nvim
 cargo info
 ```
 
@@ -252,7 +179,7 @@ Rust 实现的入口点位于 `src/lib.rs:6`：
 #[nvim::plugin]
 fn grit() -> Dictionary {
     // 初始化逻辑
-    // 注册 :GritHello 命令
+    // 注册 :Grit 命令
     // 返回 Lua 可访问的字典
 }
 ```
@@ -263,42 +190,60 @@ fn grit() -> Dictionary {
 
 ```rust
 api::create_user_command(
-    "GritHello",
-    "echo 'Hello World from Grit plugin!'",
+    "Grit",
+    grit_command,
     &opts,
 );
 ```
 
-### 9.3 与 Lua 的交互
+### 9.3 功能实现
+
+`grit_command` 函数实现了以下功能：
+1. 打开新的标签页
+2. 创建可列出但不可编辑的缓冲区
+3. 设置缓冲区名称为 "GritStatus"
+4. 在缓冲区中添加初始内容（包含命令提示）
+5. 配置缓冲区属性（只读、无行号等）
+6. 设置文件类型为 grit 以启用语法高亮
+
+### 9.4 与 Lua 的交互
 
 插件通过返回 `Dictionary` 类型与 Lua 进行数据交换。
 
-## 10. 常见问题
+## 10. 语法高亮
 
-### 10.1 编译失败
+syntax/grit.vim 文件提供了 GritStatus 缓冲区的语法高亮：
 
-#### 10.1.1 链接器错误（macOS）
+- `GritHint`：高亮 "Hint: " 为注释
+- `GritTab`：高亮 "<tab>" 为关键字
+- `GritCommand`：高亮命令前缀（za, s, u, x, c, ?）为关键字
+
+## 11. 常见问题
+
+### 11.1 编译失败
+
+#### 11.1.1 链接器错误（macOS）
 
 **错误：** `Undefined symbols for architecture arm64` 或 `x86_64`，找不到 `_lua_*` 或 `_nvim_*` 符号
 
-**解决：** 确保项目根目录下存在 `.cargo/config.toml` 文件，并且包含正确的 macOS 链接器配置（如 4.1 节所述）。如果文件不存在，重新创建该文件即可。
+**解决：** 确保项目根目录下存在 `.cargo/config.toml` 文件，并且包含正确的 macOS 链接器配置。如果文件不存在，重新创建该文件即可。
 
-#### 10.1.2 找不到 Neovim 头文件
+#### 11.1.2 找不到 Neovim 头文件
 
 **错误：** 找不到 Neovim 头文件
 **解决：** 确保安装了 Neovim 0.9+ 版本，并且在系统路径中可以找到。
 
-### 10.2 插件无法加载
+### 11.2 插件无法加载
 
 **错误：** Neovim 启动时显示 "E5113: Error while calling lua chunk: cannot load module 'grit'"
 **解决：** 检查 `lua/grit.so` 是否存在，以及编译是否成功。
 
-### 10.3 命令无法使用
+### 11.3 命令无法使用
 
-**错误：** 执行 :GritHello 显示 "Not an editor command"
+**错误：** 执行 :Grit 显示 "Not an editor command"
 **解决：** 检查插件是否正确加载，以及命令注册是否成功。
 
-## 11. 许可证
+## 12. 许可证
 
 项目使用 MIT 许可证（根据 Cargo.toml 配置）。
 
