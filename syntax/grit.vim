@@ -20,7 +20,7 @@ syn match GritCommand "s" containedin=ALL
 syn match GritCommand "u" containedin=ALL
 syn match GritCommand "x" containedin=ALL
 syn match GritCommand "c" containedin=ALL
-syn match GritCommand "\?" containedin=ALL
+syn match GritCommand "?" containedin=ALL
 hi def link GritCommand Keyword
 
 " Mark syntax as loaded
