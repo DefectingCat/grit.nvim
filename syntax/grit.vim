@@ -14,5 +14,14 @@ hi def link GritHint Comment
 syn match GritTab "<tab>" containedin=ALL
 hi def link GritTab Keyword
 
+" Highlight command prefixes as keywords
+syn match GritCommand "za" containedin=ALL
+syn match GritCommand "s" containedin=ALL
+syn match GritCommand "u" containedin=ALL
+syn match GritCommand "x" containedin=ALL
+syn match GritCommand "c" containedin=ALL
+syn match GritCommand "\?" containedin=ALL
+hi def link GritCommand Keyword
+
 " Mark syntax as loaded
 let b:current_syntax = "grit"
