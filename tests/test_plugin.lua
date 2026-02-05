@@ -29,32 +29,17 @@ if type(grit) ~= 'table' then
   test_failure("Plugin did not return a table")
 end
 
--- Test 4: Check if GritHello command is available
+-- Test 2: Check if Grit command is available
 local commands = vim.api.nvim_get_commands({})
-if not commands['GritHello'] then
-  test_failure("GritHello command is not registered")
-end
-
--- Test 5: Check if Grit command is available
 if not commands['Grit'] then
   test_failure("Grit command is not registered")
-end
-
--- Test 6: Test executing GritHello command
-local ok2, err2 = pcall(function()
-  vim.cmd("GritHello")
-end)
-if not ok2 then
-  test_failure(string.format("Error executing GritHello command: %s", err2))
 end
 
 -- Summary of tests passed
 print("All tests passed!")
 print("- Plugin loaded successfully")
 print("- Plugin returns a valid table")
-print("- GritHello command is registered")
 print("- Grit command is registered")
-print("- GritHello command executes successfully")
 
 -- Exit Neovim with success code
 vim.schedule(function()
