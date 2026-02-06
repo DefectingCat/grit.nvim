@@ -1,9 +1,9 @@
 use nvim_oxi as nvim;
+use nvim_oxi::Dictionary;
+use nvim_oxi::Result;
 use nvim_oxi::api;
 use nvim_oxi::api::opts::CreateCommandOpts;
 use nvim_oxi::api::types::CommandArgs;
-use nvim_oxi::Dictionary;
-use nvim_oxi::Result;
 
 #[nvim::plugin]
 fn grit() -> Dictionary {
@@ -57,9 +57,6 @@ fn grit_command(_args: CommandArgs) -> Result<()> {
 
     // 设置退出快捷键 (q)：关闭当前 tab（无命令显示）
     api::command("nnoremap <silent> <buffer> q :tabclose<CR>")?;
-
-    // 设置 Esc 键作为退出快捷键（无命令显示）
-    api::command("nnoremap <silent> <buffer> <Esc> :tabclose<CR>")?;
 
     Ok(())
 }
