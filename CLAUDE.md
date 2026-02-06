@@ -6,7 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Neovim plugin written in Rust using the nvim-oxi library. Provides:
 
-- `:GritHello` command: Prints "Hello World from Grit plugin!" in the Neovim command line
 - `:Grit` command: Opens a new tab with a GritStatus buffer showing Git status and commands
 
 ## Key Commands
@@ -56,7 +55,7 @@ If you need to access nvim-oxi files, use `cargo vendor`
 ### Plugin Functionality
 
 1. Plugin initializes via `grit()` function in `src/lib.rs:6`
-2. Registers `:GritHello` and `:Grit` commands using Neovim API
+2. Registers `:Grit` command using Neovim API
 3. `:Grit` command creates a read-only GritStatus buffer
 4. Displays Git status information and command hints
 5. Supports syntax highlighting for command prefixes
